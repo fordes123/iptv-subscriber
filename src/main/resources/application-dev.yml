@@ -1,0 +1,34 @@
+quarkus:
+  http:
+    port: 8848
+
+scheduled:
+  source: '0/2 * * * * ?'
+  epg: '0/2 * * * * ?'
+
+iptv-subscriber:
+  parser:
+    read-buffer-size: 8196
+    parse-domain-addr : false # 解析域名对应的IP类型
+
+  epg:
+    - http://epg.51zmt.top:8000/
+
+  source:
+    - https://raw.githubusercontent.com/joevess/IPTV/main/home.m3u8
+
+  output:
+    - file: cctv-ipv4.m3u
+      filter:
+        - addr:IPV4    # 地址为 ipv4
+        - dpi:1080 # 分辨率不低于 1080P
+        - fps:30   # 帧率不低于 30
+      group:
+        央视:
+          - addr:IPV4
+          - dpi:1080
+          - fps:30
+          - name:/.*cctv.*/
+        卫视:
+          - addr:IPV4
+          - name:/.*卫视.*/

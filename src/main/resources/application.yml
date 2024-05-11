@@ -1,0 +1,10 @@
+quarkus:
+  application:
+    name: iptv-subscriber
+
+  profile: dev
+  jackson:
+    timezone: PRC
+  default-locale: zh_CN
+  banner:
+    path: banner.txt
