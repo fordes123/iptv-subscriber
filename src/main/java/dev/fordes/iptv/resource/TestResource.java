@@ -12,7 +12,7 @@ import io.vertx.mutiny.core.Vertx;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
-import org.jboss.logmanager.Logger;
+import lombok.extern.slf4j.Slf4j;
 
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -23,6 +23,7 @@ import java.util.List;
 /**
  * @author Chengfs on 2023/12/22
  */
+@Slf4j
 @Path("/test")
 public class TestResource {
 
@@ -34,13 +35,13 @@ public class TestResource {
         this.vertx = vertx;
     }
 
-    private static final Logger log = Logger.getLogger(TestResource.class.getName());
+//    private static final Logger log = Logger.getLogger(TestResource.class.getName());
 
     @GET
     @Path("/1")
     public Uni<List<Channel>> test() {
-        return config.source().collect().asList();
-//        return Multi.createFrom().empty();
+//        return config.source().collect().asList();
+        return Uni.createFrom().nullItem();
     }
 
     @GET
@@ -89,6 +90,7 @@ public class TestResource {
     @GET
     @Path("/5")
     public Multi<String> test5() throws MalformedURLException {
+        log.error("hello world");
         URL url = URI.create("http://hls.weathertv.cn/tslslive/qCFIfHB/hls/live_sd.m3u8").toURL();
         HttpUtil.get(url, resp -> {
             resp.body().subscribe()

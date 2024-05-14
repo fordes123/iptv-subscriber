@@ -2,6 +2,7 @@ package dev.fordes.iptv.model;
 
 
 import dev.fordes.iptv.model.enums.tag.Addr;
+import dev.fordes.iptv.model.enums.tag.Status;
 import lombok.Data;
 
 import java.net.URL;
@@ -17,7 +18,7 @@ public class Channel {
     public static final String TVG_NAME = "tvg-name";
     public static final String TVG_LOGO = "tvg-logo";
     public static final String GROUP_TITLE = "group-title";
-
+    public static final String X_TVG_URL = "x-tvg-url";
 
     /**
      * 扩展标签，用于定义频道的持续时间（以秒为单位）。-1 通常表示直播流，没有确定的节目长度。
@@ -50,17 +51,27 @@ public class Channel {
     private String displayName;
 
     /**
+     * xml节目单地址
+     */
+    private URL tvgUrl;
+
+    /**
+     * 地址
+     */
+    private URL url;
+
+    /**
      * 比特率
      */
     public Integer bitrate;
 
     /**
-     * 理论下载速度
+     * 播放速度，Mbps
      */
     public Double speed;
 
     /**
-     * 分辨率
+     * 横向分辨率
      */
     public Integer imageWidth;
 
@@ -80,8 +91,8 @@ public class Channel {
     public Addr type;
 
     /**
-     * 地址
+     * 评估状态
      */
-    private URL url;
+    private Status status;
 
 }

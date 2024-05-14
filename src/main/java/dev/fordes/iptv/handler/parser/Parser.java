@@ -10,6 +10,7 @@ import dev.fordes.iptv.util.HttpUtil;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.core.buffer.Buffer;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.nio.charset.StandardCharsets;
@@ -18,14 +19,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-import java.util.logging.Logger;
 
+@Slf4j
 public abstract class Parser implements Supplier<Multi<Channel>> {
 
     protected final String path;
     protected final ISProperties.Parser config;
     private Buffer cache = Buffer.buffer();
-    private static final Logger log = Logger.getLogger(Parser.class.getName());
 
     public Parser(ISProperties.Parser config, String path) {
         this.config = config;

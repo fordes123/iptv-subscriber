@@ -13,8 +13,8 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.jboss.logmanager.Logger;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+@Slf4j
 public abstract class JSON {
 
     public static final String LEFT_BRACE = "{";
@@ -43,8 +44,6 @@ public abstract class JSON {
     protected static final DateTimeFormatter localDateTimeFormatter = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
     protected static final DateTimeFormatter localDateFormatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
     protected static final DateTimeFormatter localTimeFormatter = DateTimeFormatter.ofPattern(TIME_FORMAT);
-
-    private static final Logger log = Logger.getLogger(JSON.class.getName());
 
     private JSON() {
     }
@@ -131,7 +130,7 @@ public abstract class JSON {
             try {
                 return mapper.writeValueAsString(obj);
             } catch (JsonProcessingException e) {
-                log.severe("JsonProcessingException: " + e.getMessage());
+                log.warn("JsonProcessingException: {}", e.getMessage());
             }
         }
         return null;
@@ -176,7 +175,7 @@ public abstract class JSON {
             try {
                 return mapper.writeValueAsBytes(obj);
             } catch (JsonProcessingException e) {
-                log.severe("JsonProcessingException:" + e.getMessage());
+                log.warn("JsonProcessingException: {}", e.getMessage());
             }
         }
         return null;
@@ -195,7 +194,7 @@ public abstract class JSON {
                 JavaType javaType = mapper.getTypeFactory().constructParametricType(List.class, clazz);
                 return mapper.readValue(json, javaType);
             } catch (JsonProcessingException e) {
-                log.severe("JsonProcessingException:" + e.getMessage());
+                log.warn("JsonProcessingException: {}", e.getMessage());
             }
         }
         return null;
@@ -214,7 +213,7 @@ public abstract class JSON {
                 JavaType javaType = mapper.getTypeFactory().constructParametricType(Set.class, clazz);
                 return mapper.readValue(json, javaType);
             } catch (IOException e) {
-                log.severe("JsonProcessingException:" + e.getMessage());
+                log.warn("JsonProcessingException: {}", e.getMessage());
             }
         }
         return null;
@@ -235,7 +234,7 @@ public abstract class JSON {
             try {
                 return mapper.readValue(json, typeReference);
             } catch (Exception e) {
-                log.severe("JsonProcessingException:" + e.getMessage());
+                log.warn("JsonProcessingException: {}", e.getMessage());
             }
         }
         return null;
@@ -254,7 +253,7 @@ public abstract class JSON {
             try {
                 return mapper.readValue(json, tClass);
             } catch (Exception e) {
-                log.severe("JsonProcessingException:" + e.getMessage());
+                log.warn("JsonProcessingException: {}", e.getMessage());
             }
         }
         return null;
@@ -272,7 +271,7 @@ public abstract class JSON {
             try {
                 return mapper.readTree(json).get(key);
             } catch (JsonProcessingException e) {
-                log.severe("JsonProcessingException:" + e.getMessage());
+                log.warn("JsonProcessingException: {}", e.getMessage());
             }
         }
         return null;
@@ -294,7 +293,7 @@ public abstract class JSON {
                     return mapper.readValue(valueNode.traverse(), typeReference);
                 }
             } catch (IOException e) {
-                log.severe("JsonProcessingException:" + e.getMessage());
+                log.warn("JsonProcessingException: {}", e.getMessage());
             }
         }
         return null;
@@ -316,7 +315,7 @@ public abstract class JSON {
                     return mapper.readValue(valueNode.traverse(), clazz);
                 }
             } catch (IOException e) {
-                log.severe("JsonProcessingException:" + e.getMessage());
+                log.warn("JsonProcessingException: {}", e.getMessage());
             }
         }
         return null;
@@ -339,7 +338,7 @@ public abstract class JSON {
                     return mapper.readValue(valueNode.traverse(), javaType);
                 }
             } catch (IOException e) {
-                log.severe("JsonProcessingException:" + e.getMessage());
+                log.warn("JsonProcessingException: {}", e.getMessage());
             }
         }
         return null;
@@ -362,7 +361,7 @@ public abstract class JSON {
                     return mapper.readValue(valueNode.traverse(), javaType);
                 }
             } catch (IOException e) {
-                log.severe("JsonProcessingException:" + e.getMessage());
+                log.warn("JsonProcessingException: {}", e.getMessage());
             }
         }
         return null;

@@ -8,3 +8,16 @@ quarkus:
   default-locale: zh_CN
   banner:
     path: banner.txt
+
+  log:
+    level: INFO
+    file:
+      path: logs/iptv-subscriber.log
+      level: WARN
+      encoding: UTF-8
+    console:
+      level: INFO
+      format: "%d{HH:mm:ss} %-5p [%c{2.}] (%t) %s%e%n"
+    category:
+      "dev.fordes.iptv":
+        level: DEBUG
