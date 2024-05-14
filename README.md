@@ -4,6 +4,15 @@ This project uses Quarkus, the Supersonic Subatomic Java Framework.
 
 If you want to learn more about Quarkus, please visit its website: https://quarkus.io/ .
 
+## TODO
+
+- [ ] 订阅和合并不同格式不同来源的 IPTV 源
+- [ ] 全自动源检测，除可用性外，还包含画质、速度、帧率、码率等
+- [ ] 自动去重、自动补全节目单、频道标志
+- [ ] 支持 IPV4/IPV6 网络、HTTP/HTTPS 协议、M3U/TXT 格式
+- [ ] 高度自定义配置，根据各种条件对频道进行分类筛选
+- [ ] 定时处理自动生成订阅链接，提供 HTTP 接口，快捷高效
+
 ## 标签
 
 在输出配置中，由多个标签组成过滤项，帮助我们简单的对频道进行筛选和分类，
