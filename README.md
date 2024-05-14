@@ -4,92 +4,38 @@ This project uses Quarkus, the Supersonic Subatomic Java Framework.
 
 If you want to learn more about Quarkus, please visit its website: https://quarkus.io/ .
 
-## Running the application in dev mode
+## 标签
 
-You can run your application in dev mode that enables live coding using:
+在输出配置中，由多个标签组成过滤项，帮助我们简单的对频道进行筛选和分类，
+它的格式为：`<tagName>:<value>`，下面是一份示例的输出配置：  
 
-```shell script
-./gradlew quarkusDev
+```
+output:
+  - file: cctv-ipv4.m3u
+    filter:
+      - addr:IPV4    # 地址为 ipv4
+      - dpi:1080 # 分辨率不低于 1080P
+      - fps:30   # 帧率不低于 30
+    group:
+      央视:
+        - name:/.*cctv.*/
+      卫视:
+        - name:/.*卫视.*/
 ```
 
-> **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at http://localhost:8080/q/dev/.
+在如上配置中，通过标签，将地址为IPV4、分辨率1080、帧率30的频道分配至 `cctv-ipv4.m3u` 文件中，
+同时，根据正则表达式匹配频道名将它们分为 `央视` 和 `卫视` 两个分组。更多关于标签的信息如下表：
 
-## Packaging and running the application
+| 标签   | 名称 (tagName) | 预设值 (value) | 自定义 (value) | 示例/说明
+|:-----|:------|:-------|:----- |:------|
+| 分辨率  | `dpi` | `SD`(480) 、`HD`(720)、 `FHD`(1080)、 `UHD`(2160)、`FUHD`(4320) | `<number>` | 视频分辨率，以横向像素为准
+| 帧率   | `fps` | - | `<number>` | 视频帧率
+| 码率   | `rate` | - | `<number>` | 视频码率，单位: `kbps`
+| 视频编码 | `codec` | `h264`、`hevc`、`h265`、`av1` ... | `<string>` | 合法且受支持的编码名，参见 [FFmpeg](https://ffmpeg.org/)
+| 频道名 | `name` | - | `<string>` | 使用通配符号或以`/`开头和结尾的正则
+| 地址类型 | `addr` | `IPV4`、`IPV6` 、`DOMAIN` | - | 默认不会将域名解析为IP
+| 速度 | `speed` | - | `<number>` | 视频播放速度，单位: `Mbps`
+| 状态 | `state` | `fail` 、`unhealthy` 、`healthy` 、 `excellent` | - | 720P 25帧 8M (全部满足)认定为良好，否则为不健康；1080P 60帧 10M 及以上为极佳
 
-The application can be packaged using:
-
-```shell script
-./gradlew build
-```
-
-It produces the `quarkus-run.jar` file in the `build/quarkus-app/` directory.
-Be aware that it’s not an _über-jar_ as the dependencies are copied into the `build/quarkus-app/lib/` directory.
-
-The application is now runnable using `java -jar build/quarkus-app/quarkus-run.jar`.
-
-If you want to build an _über-jar_, execute the following command:
-
-```shell script
-./gradlew build -Dquarkus.package.type=uber-jar
-```
-
-The application, packaged as an _über-jar_, is now runnable using `java -jar build/*-runner.jar`.
-
-## Creating a native executable
-
-You can create a native executable using:
-
-```shell script
-./gradlew build -Dquarkus.package.type=native
-```
-
-Or, if you don't have GraalVM installed, you can run the native executable build in a container using:
-
-```shell script
-./gradlew build -Dquarkus.package.type=native -Dquarkus.native.container-build=true
-```
-
-You can then execute your native executable with: `./build/iptv-subscriber-1.0-SNAPSHOT-runner`
-
-If you want to learn more about building native executables, please consult https://quarkus.io/guides/gradle-tooling.
-
-## Related Guides
-
-- REST ([guide](https://quarkus.io/guides/rest)): A Jakarta REST implementation utilizing build time processing and
-  Vert.x. This extension is not compatible with the quarkus-resteasy extension, or any of the extensions that depend on
-  it.
-- REST Jackson ([guide](https://quarkus.io/guides/rest#json-serialisation)): Jackson serialization support for Quarkus
-  REST. This extension is not compatible with the quarkus-resteasy extension, or any of the extensions that depend on it
-- YAML Configuration ([guide](https://quarkus.io/guides/config-yaml)): Use YAML to configure your Quarkus application
-- Scheduler ([guide](https://quarkus.io/guides/scheduler)): Schedule jobs and tasks
-
-## Provided Code
-
-### YAML Config
-
-Configure your application with YAML
-
-[Related guide section...](https://quarkus.io/guides/config-reference#configuration-examples)
-
-The Quarkus application configuration is located in `src/main/resources/application.yml`.
-
-### REST
-
-Easily start your REST Web Services
-
-[Related guide section...](https://quarkus.io/guides/getting-started-reactive#reactive-jax-rs-resources)
-
-### 可用标签
-
-> 标签格式 `<tagName>:<value>`
-
-| tagName | value 预设                                                       |                          自定义                           | 说明          
-|:--------|:---------------------------------------------------------------|:------------------------------------------------------:|:------------
-| dpi     | `SD`(480) 、`HD`(720)、 `FHD`(1080)、 `UHD`(2160)、`FUHD`(4320)    |            `<number>` 视频分辨率，以横向像素为准，如 1080             | 分辨率         
-| fps     | -                                                              |                    `<number>` 如 25                     | 帧率          
-| rate    | -                                                              |              `<number>` 如 866, 单位: `kbps`              | 码率          
-| codec   | `h264`、`hevc`、`h265`、`av1` 等                                   | `<string>` 合法且受支持的编码名，参见 [FFmpeg](https://ffmpeg.org/) | 视频编码        
-| name    | -                                                              |                   `<string>` 频道名通配符                    | 频道名         
-| addr    | `IPV4`、`IPV6` 、`DOMAIN`                                        |                           -                            | 请求地址类型      
-| speed   | -                                                              |              `<number>` 如 20, 单位: `mbps`               | 理论播放速率      
-| status  | `fail`(不可用) 、`unhealthy`(不健康) 、`healthy`(良好) 、 `excellent`(极佳) |                           -                            | 程序评估状态，仅供参考 
+> - `<number>` 类型标签全部以 **大于等于** 模式匹配  
+> - 多个标签之间为 `且` 关系，即必须全部满足

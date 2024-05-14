@@ -2,7 +2,7 @@ package dev.fordes.iptv.model;
 
 
 import dev.fordes.iptv.model.enums.tag.Addr;
-import dev.fordes.iptv.model.enums.tag.Status;
+import dev.fordes.iptv.model.enums.tag.State;
 import lombok.Data;
 
 import java.net.URL;
@@ -93,6 +93,6 @@ public class Channel {
     /**
      * 评估状态
      */
-    private Status status;
+    private State status;
 
 }
