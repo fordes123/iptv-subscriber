@@ -3,7 +3,6 @@ package dev.fordes.iptv.handler.parser;
 
 import dev.fordes.iptv.config.ISProperties;
 import dev.fordes.iptv.model.Channel;
-import dev.fordes.iptv.model.enums.tag.Addr;
 import dev.fordes.iptv.util.Constants;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -61,7 +60,7 @@ public class M3uParser extends Parser {
         while (iterator.hasNext()) {
             String line = iterator.next();
             String ext = null;
-            while (line.startsWith(Channel.EXTINF) && iterator.hasNext()) {
+            while (line.startsWith(Channel.EXT_INF) && iterator.hasNext()) {
                 ext = line;
                 line = iterator.next();
             }
@@ -99,7 +98,7 @@ public class M3uParser extends Parser {
             channel.setGroupTitle(infoMap.get(Channel.GROUP_TITLE));
             channel.setDisplayName(namePart);
             channel.setUrl(url);
-            channel.setType(Addr.fromURL(url));
+
             return channel;
         } catch (Exception e) {
             throw new RuntimeException("parsing error:" + e.getMessage() + "\n line:" + line

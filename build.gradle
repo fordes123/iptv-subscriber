@@ -16,6 +16,9 @@ dependencies {
     implementation 'io.quarkus:quarkus-scheduler'
     implementation 'io.quarkus:quarkus-arc'
     implementation 'io.quarkus:quarkus-vertx'
+    implementation "io.quarkus:quarkus-smallrye-openapi"
+    implementation "io.quarkus:quarkus-swagger-ui"
+    implementation "io.quarkus:quarkus-hibernate-validator"
 
     implementation "org.bytedeco:javacv-platform:${javacvVersion}"
     implementation 'org.apache.commons:commons-lang3:3.14.0'
@@ -39,6 +42,12 @@ java {
 
 test {
     systemProperty "java.util.logging.manager", "org.jboss.logmanager.LogManager"
+}
+
+processResources {
+    filesMatching("application.yml") {
+        expand(project.properties)
+    }
 }
 
 compileJava {

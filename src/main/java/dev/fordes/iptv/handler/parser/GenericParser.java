@@ -3,7 +3,6 @@ package dev.fordes.iptv.handler.parser;
 
 import dev.fordes.iptv.config.ISProperties;
 import dev.fordes.iptv.model.Channel;
-import dev.fordes.iptv.model.enums.tag.Addr;
 import dev.fordes.iptv.util.Constants;
 import org.apache.commons.lang3.StringUtils;
 import org.jboss.logmanager.Logger;
@@ -53,7 +52,6 @@ public class GenericParser extends Parser {
             channel.setGroupTitle(StringUtils.substringBefore(ext, Constants.COMMA));
             channel.setDisplayName(name);
             channel.setUrl(url);
-            channel.setType(Addr.fromURL(url));
             return channel;
         } catch (Exception e) {
             throw new RuntimeException("parsing error:" + e.getMessage() + "\n line:" + line

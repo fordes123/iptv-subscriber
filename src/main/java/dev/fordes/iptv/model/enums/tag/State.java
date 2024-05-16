@@ -14,7 +14,7 @@ public enum State {
 
     /**
      * 不健康<br/>
-     * 不满足: 720P 25帧 8M
+     * 不满足: HD 25帧 5M
      */
     UNHEALTHY(0),
 
@@ -25,7 +25,7 @@ public enum State {
 
     /**
      * 极佳<br/>
-     * 满足: 1080P 60帧 10M
+     * 满足: FHD 60帧 8M
      */
     EXCELLENT(2)
 

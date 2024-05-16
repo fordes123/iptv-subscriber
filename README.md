@@ -44,7 +44,7 @@ output:
 | 频道名 | `name` | - | `<string>` | 使用通配符号或以`/`开头和结尾的正则
 | 地址类型 | `addr` | `IPV4`、`IPV6` 、`DOMAIN` | - | 默认不会将域名解析为IP
 | 速度 | `speed` | - | `<number>` | 视频播放速度，单位: `Mbps`
-| 状态 | `state` | `fail` 、`unhealthy` 、`healthy` 、 `excellent` | - | 720P 25帧 8M (全部满足)认定为良好，否则为不健康；1080P 60帧 10M 及以上为极佳
+| 状态 | `state` | `fail` 、`unhealthy` 、`healthy` 、 `excellent` | - | HD 25帧 5M 认定为良好，否则为不健康；FHD 60帧 10M 及以上为极佳
 
 > - `<number>` 类型标签全部以 **大于等于** 模式匹配  
 > - 多个标签之间为 `且` 关系，即必须全部满足

@@ -1,13 +1,34 @@
 quarkus:
   application:
-    name: iptv-subscriber
+    name: {project.name}
+    version: {project.version}
+    debug: true
 
-  profile: dev
+  http:
+    root-path: /api/v1
+    non-application-root-path: /dev
+
   jackson:
     timezone: PRC
-  default-locale: zh_CN
+
   banner:
     path: banner.txt
+
+  profile: dev
+  default-locale: zh_CN
+
+  swagger-ui:
+    path: /api-doc/ui
+    always-include: true
+
+  smallrye-openapi:
+    path: /api-doc
+    info-title: {project.name}
+    info-version: {project.version}
+    info-contact-name: fordes123
+    info-contact-url: https://fordes.dev
+    info-license-name: AGPLv3
+    info-license-url: https://www.gnu.org/licenses/agpl-3.0.en.html
 
   log:
     level: INFO
