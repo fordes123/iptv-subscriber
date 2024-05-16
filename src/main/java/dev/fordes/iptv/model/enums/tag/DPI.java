@@ -12,9 +12,9 @@ import java.util.Comparator;
 @RequiredArgsConstructor
 public enum DPI {
 
-    SD(720, 480, null),
-    HD(1280, 720, null),
-    FHD(1920, 1080, null),
+    SD(720, 480, "480P"),
+    HD(1280, 720, "720P"),
+    FHD(1920, 1080, "1080P"),
     UHD(3840, 2160, "4K"),
     FUHD(7680, 4320, "8K"),
     ;
