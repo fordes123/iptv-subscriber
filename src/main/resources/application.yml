@@ -19,11 +19,11 @@ quarkus:
   default-locale: zh_CN
 
   swagger-ui:
-#    path: /api-doc/ui
+    path: /api-doc
     always-include: true
 
   smallrye-openapi:
-#    path: /api-doc
+    path: /openapi
     info-title: {project.name}
     info-version: {project.version}
     info-contact-name: fordes123

@@ -5,7 +5,6 @@ import dev.fordes.iptv.model.Channel;
 import dev.fordes.iptv.model.Metadata;
 import dev.fordes.iptv.model.domain.Code;
 import dev.fordes.iptv.model.domain.R;
-import dev.fordes.iptv.model.vo.ChannelVO;
 import io.smallrye.mutiny.Uni;
 import io.smallrye.mutiny.unchecked.Unchecked;
 import jakarta.validation.Valid;
@@ -14,11 +13,17 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.MediaType;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.media.Content;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 
 import java.net.URI;
+
+import static dev.fordes.iptv.util.Constants.HTTP_PREFIX_REGEX;
 
 /**
  * @author Chengfs on 2024/5/16
@@ -30,8 +35,8 @@ public class ChannelResource {
     @GET
     @Path("/")
     @Operation(summary = "通过URL获取频道信息")
-    public Uni<R<ChannelVO>> channel(@Valid @NotBlank @Pattern(regexp = "^https?:\\/\\/.+$")
-                                     @Parameter(name = "url", required = true) @QueryParam("url") String url) {
+    @APIResponse(responseCode = "200", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Channel.class)))
+    public Uni<?> channel(@Valid @NotBlank @Pattern(regexp = HTTP_PREFIX_REGEX) @QueryParam("url") String url) {
         return Uni.createFrom().item(url)
                 .onItem().transform(Unchecked.function(e -> {
                     Channel channel = new Channel();
@@ -39,7 +44,7 @@ public class ChannelResource {
                     return channel;
                 }))
                 .flatMap(Checker::check)
-                .map(e -> R.ok(ChannelVO.of(e)))
+                .map(R::ok)
                 .onFailure()
                 .recoverWithItem(e -> {
                     log.error("url: {}, {}: ", url, e.getMessage(), e);
@@ -50,8 +55,9 @@ public class ChannelResource {
     @GET
     @Path("/metadata")
     @Operation(summary = "通过URL获取频道元数据")
-    public Uni<R<Metadata>> metadata(@Valid @NotBlank @Pattern(regexp = "^https?:\\/\\/.+$")
-                                     @Parameter(name = "url", required = true) @QueryParam("url") String url) {
+    @Parameter(name = "url", required = true)
+    @APIResponse(responseCode = "200", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Metadata.class)))
+    public Uni<?> metadata(@Valid @NotBlank @Pattern(regexp = HTTP_PREFIX_REGEX) @QueryParam("url") String url) {
         return Uni.createFrom().item(url)
                 .map(Unchecked.function(e -> URI.create(e).toURL()))
                 .flatMap(Checker::detectMetadata)

@@ -29,6 +29,7 @@ public class Constants {
 
     public static final String HTTP_PREFIX = "http://";
     public static final String HTTPS_PREFIX = "https://";
+    public static final String HTTP_PREFIX_REGEX = "^http(s)?://.*$";
 
     public static final String TS = "ts";
     public static final String M3U8 = "m3u8";

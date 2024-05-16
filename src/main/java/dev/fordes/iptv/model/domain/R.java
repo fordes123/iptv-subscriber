@@ -1,6 +1,7 @@
 package dev.fordes.iptv.model.domain;
 
 import lombok.Getter;
+import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
 import java.io.Serial;
@@ -11,7 +12,7 @@ import java.util.Optional;
 @Schema(name = "R" , description = "全局响应体")
 public class R<T> implements Serializable {
 
-    @Schema(description = "状态码", required = true, implementation = Code.class)
+    @Schema(description = "状态码", required = true, type = SchemaType.INTEGER, implementation = Code.class)
     private final Code code;
 
     @Schema(description = "响应消息")

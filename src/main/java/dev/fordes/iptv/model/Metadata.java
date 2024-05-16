@@ -5,6 +5,7 @@ import dev.fordes.iptv.model.enums.tag.DPI;
 import dev.fordes.iptv.model.enums.tag.State;
 import lombok.Data;
 import lombok.experimental.Accessors;
+import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
 import java.util.Optional;
@@ -13,7 +14,7 @@ import java.util.Optional;
  * @author Chengfs on 2024/5/15
  */
 @Data
-@Schema(name = "Metadata" , description = "标签元数据")
+@Schema(name = "Metadata", description = "标签元数据")
 @Accessors(chain = true)
 public class Metadata {
 
@@ -44,7 +45,7 @@ public class Metadata {
     /**
      * 分辨率等级，基于横向分辨率计算
      */
-    @Schema(description = "分辨率等级", implementation = DPI.class)
+    @Schema(description = "分辨率等级", type = SchemaType.STRING, implementation = DPI.class)
     public DPI resolution;
 
     /**
@@ -62,13 +63,13 @@ public class Metadata {
     /**
      * 地址类型 {@link Addr}
      */
-    @Schema(description = "地址类型", implementation = Addr.class)
+    @Schema(description = "地址类型", type = SchemaType.STRING)
     public Addr type;
 
     /**
      * 评估状态 {@link State}
      */
-    @Schema(description = "评估状态", implementation = State.class)
+    @Schema(description = "评估状态", type = SchemaType.STRING)
     private State state;
 
     public void fill() {
