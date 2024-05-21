@@ -2,7 +2,6 @@ quarkus:
   application:
     name: {project.name}
     version: {project.version}
-    debug: true
 
   http:
     port: 8848
@@ -43,3 +42,6 @@ quarkus:
     category:
       "dev.fordes.iptv":
         level: DEBUG
+
+iptv-subscriber:
+  debug: true

@@ -21,7 +21,7 @@ import java.util.Optional;
 @Provider
 public class ResponseFilter implements ContainerResponseFilter {
 
-    @ConfigProperty(name = "quarkus.application.debug", defaultValue = "false")
+    @ConfigProperty(name = "iptv-subscriber.debug", defaultValue = "false")
     boolean debug;
 
     @Override
