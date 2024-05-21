@@ -74,4 +74,18 @@ public class Channel {
      */
     @Schema(description = "频道标签信息", implementation = Metadata.class)
     private Metadata metadata;
+
+    public Channel copy() {
+        Channel channel = new Channel();
+        channel.setExtInf(this.getExtInf());
+        channel.setTvgId(this.getTvgId());
+        channel.setTvgName(this.getTvgName());
+        channel.setTvgLogo(this.getTvgLogo());
+        channel.setGroupTitle(this.getGroupTitle());
+        channel.setDisplayName(this.getDisplayName());
+        channel.setUrl(this.getUrl());
+        channel.setTvgUrl(this.getTvgUrl());
+        channel.setMetadata(this.getMetadata());
+        return channel;
+    }
 }

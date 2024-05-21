@@ -1,7 +1,9 @@
 package dev.fordes.iptv.model.enums;
 
 import io.vertx.mutiny.core.Vertx;
+import lombok.Getter;
 
+@Getter
 public enum MutinyVertx {
 
     INSTANCE,
@@ -13,7 +15,4 @@ public enum MutinyVertx {
         vertx = Vertx.vertx();
     }
 
-    public Vertx getVertx() {
-        return vertx;
-    }
 }

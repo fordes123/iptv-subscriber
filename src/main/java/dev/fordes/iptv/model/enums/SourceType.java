@@ -2,13 +2,12 @@ package dev.fordes.iptv.model.enums;
 
 import dev.fordes.iptv.util.FileSuffix;
 import io.smallrye.mutiny.Uni;
-import org.jboss.logmanager.Logger;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public enum SourceType {
 
     M3U, GENERIC;
-
-    private static final Logger log = Logger.getLogger(SourceType.class.getName());
 
     public static Uni<SourceType> of(String path) {
         String suffix = FileSuffix.get(path);
@@ -20,6 +19,7 @@ public enum SourceType {
 
     public static Uni<SourceType> trySourceType(String path) {
         return Uni.createFrom().item(SourceType.GENERIC);
+        //TODO
 //        try {
 //            Multi<SourceType> emitter1 = Multi.createFrom().emitter(emitter -> {
 //                CommonUtils.httpGet(path, opt -> opt.setMaxChunkSize(1024), response -> {

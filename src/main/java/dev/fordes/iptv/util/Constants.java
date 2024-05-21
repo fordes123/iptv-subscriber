@@ -15,6 +15,7 @@ public class Constants {
     public static final String SLASH = "/";
     public static final String CR = "\r";
     public static final String QUESTION = "?";
+    public static final String EQ = "=";
 
     public static final char DOT_C = '.';
     public static final char COMMA_C = ',';

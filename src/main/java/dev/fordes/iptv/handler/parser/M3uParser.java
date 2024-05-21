@@ -53,7 +53,7 @@ public class M3uParser extends Parser {
         String last = lines.get(lines.size() - 1);
         if (last.startsWith(Constants.SHARP)) {
             residue = last.getBytes(StandardCharsets.UTF_8);
-            lines.remove(lines.size() - 1);
+            lines.removeLast();
         }
 
         Iterator<String> iterator = lines.iterator();

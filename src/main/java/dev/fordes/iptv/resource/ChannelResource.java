@@ -1,10 +1,13 @@
 package dev.fordes.iptv.resource;
 
 import dev.fordes.iptv.handler.checker.Checker;
+import dev.fordes.iptv.handler.composer.Composer;
 import dev.fordes.iptv.model.Channel;
 import dev.fordes.iptv.model.Metadata;
 import dev.fordes.iptv.model.domain.Code;
 import dev.fordes.iptv.model.domain.R;
+import dev.fordes.iptv.model.enums.SourceType;
+import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import io.smallrye.mutiny.unchecked.Unchecked;
 import jakarta.validation.Valid;
@@ -67,5 +70,26 @@ public class ChannelResource {
                     log.error("url: {}, {}: ", url, e.getMessage(), e);
                     return R.of(Code.INTERNAL_SERVER_ERROR, e.getMessage());
                 });
+    }
+
+    @GET
+    @Path("/test")
+    @Operation(summary = "测试接口")
+    @Parameter(name = "url", required = true)
+    @APIResponse(responseCode = "200", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Metadata.class)))
+    public Uni<?> test(@Valid @NotBlank @Pattern(regexp = HTTP_PREFIX_REGEX) @QueryParam("url") String url) {
+        Multi<Channel> multi = Uni.createFrom().item(url)
+                .onItem().transform(Unchecked.function(e -> {
+                    Channel channel = new Channel();
+                    channel.setUrl(URI.create(e).toURL());
+                    return channel;
+                }))
+                .flatMap(Checker::check)
+                .toMulti();
+
+        Composer composer = Composer.getComposer(SourceType.M3U);
+        return composer.apply(multi)
+                .map(R::ok)
+                .toUni();
     }
 }
