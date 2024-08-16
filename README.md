@@ -41,7 +41,7 @@ services:
     restart: unless-stopped
 ```
 
-### 本地调式
+### 本地调试
 ```bash
 git clone https://github.com/fordes123/iptv-subscriber
 cd iptv-subscriber
