@@ -7,9 +7,11 @@ import dev.fordes.iptv.model.Metadata;
 import dev.fordes.iptv.model.domain.Code;
 import dev.fordes.iptv.model.domain.R;
 import dev.fordes.iptv.model.enums.SourceType;
+import dev.fordes.iptv.scheduler.SourceSchedulerTask;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import io.smallrye.mutiny.unchecked.Unchecked;
+import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -41,12 +43,10 @@ public class ChannelResource {
     @APIResponse(responseCode = "200", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Channel.class)))
     public Uni<?> channel(@Valid @NotBlank @Pattern(regexp = HTTP_PREFIX_REGEX) @QueryParam("url") String url) {
         return Uni.createFrom().item(url)
-                .onItem().transform(Unchecked.function(e -> {
-                    Channel channel = new Channel();
-                    channel.setUrl(URI.create(e).toURL());
-                    return channel;
-                }))
-                .flatMap(Checker::check)
+                .onItem().transform(Unchecked.function(e -> URI.create(e).toURL()))
+                .flatMap(e -> Checker.detectMetadata(e)
+                        .map(metadata -> Channel.builder()
+                                .url(e).metadata(metadata).build()))
                 .map(R::ok)
                 .onFailure()
                 .recoverWithItem(e -> {
@@ -91,5 +91,15 @@ public class ChannelResource {
         return composer.apply(multi)
                 .map(R::ok)
                 .toUni();
+    }
+
+    @Inject
+    SourceSchedulerTask source;
+
+    @GET
+    @Path("/test2")
+    public String test2() {
+        source.source();
+        return null; //TODO replace this stub to something useful
     }
 }

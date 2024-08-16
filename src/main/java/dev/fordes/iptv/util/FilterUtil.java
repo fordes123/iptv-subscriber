@@ -6,11 +6,10 @@ import dev.fordes.iptv.model.enums.tag.DPI;
 import dev.fordes.iptv.model.enums.tag.State;
 import io.smallrye.mutiny.tuples.Tuple2;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
-import java.util.regex.Matcher;
+import java.util.stream.Stream;
 
 /**
  * @author Chengfs on 2024/5/17
@@ -39,7 +38,7 @@ public class FilterUtil {
     }
 
     public static boolean match(Tuple2<String, String> tuple, Channel channel) {
-        return switch (tuple.getItem1()) {
+        return switch (tuple.getItem1().toUpperCase()) {
             case Flag.DPI -> {
                 Integer i = DPI.of(tuple.getItem2());
                 yield channel.getMetadata().getImageWidth() >= i;
@@ -58,8 +57,12 @@ public class FilterUtil {
                 if (tuple.getItem2().startsWith("/") && tuple.getItem2().endsWith("/")) {
                     //正则
                     String reg = StringUtils.substringBetween(tuple.getItem2(), "/", "/");
-                    Matcher matcher = RegExUtils.dotAllMatcher(reg, channel.getTvgName());
-                    yield matcher.matches();
+                    String name = Stream.of(channel.getTvgName(), channel.getTvgId(), channel.getDisplayName())
+                            .filter(e -> e != null && !e.isEmpty())
+                            .findFirst()
+                            .orElse(null);
+
+                    yield name != null && name.matches(reg);
                 } else {
                     yield channel.getTvgName().contains(tuple.getItem2());
                 }

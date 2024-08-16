@@ -2,12 +2,14 @@ package dev.fordes.iptv.util;
 
 import dev.fordes.iptv.model.enums.MutinyVertx;
 import io.smallrye.mutiny.Uni;
+import io.smallrye.mutiny.unchecked.Unchecked;
 import io.vertx.core.http.HttpClientOptions;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.mutiny.core.http.HttpClientRequest;
 import io.vertx.mutiny.core.http.HttpClientResponse;
 import org.jboss.logmanager.Logger;
 
+import java.net.URI;
 import java.net.URL;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -27,10 +29,9 @@ public class HttpUtil {
      * @return {@link Uni<HttpClientRequest>}
      */
     public static Uni<HttpClientRequest> createGet(String url, Consumer<HttpClientOptions> optionsConsumer) {
-        HttpClientOptions opt = new HttpClientOptions();
-        Optional.ofNullable(optionsConsumer).ifPresent(consumer -> consumer.accept(opt));
-        return MutinyVertx.INSTANCE.getVertx().createHttpClient(opt)
-                .request(HttpMethod.GET, url);
+        return Uni.createFrom().item(url)
+                .onItem().transform(Unchecked.function(e -> URI.create(e).toURL()))
+                .flatMap(e -> createGet(e, optionsConsumer));
     }
 
     /**
@@ -42,11 +43,14 @@ public class HttpUtil {
     public static Uni<HttpClientRequest> createGet(URL url, Consumer<HttpClientOptions> optionsConsumer) {
         String uri = url.getPath() + (url.getQuery() == null ? Constants.EMPTY : Constants.QUESTION + url.getQuery());
 
-
         HttpClientOptions opt = new HttpClientOptions();
         Optional.ofNullable(optionsConsumer).ifPresent(consumer -> consumer.accept(opt));
+        if (url.getPort() > 0) {
+            return MutinyVertx.INSTANCE.getVertx().createHttpClient(opt)
+                    .request(HttpMethod.GET, url.getPort(), url.getHost(), uri);
+        }
         return MutinyVertx.INSTANCE.getVertx().createHttpClient(opt)
-                .request(HttpMethod.GET, url.getPort(), url.getHost(), uri);
+                .request(HttpMethod.GET, url.getHost(), uri);
     }
 
     /**

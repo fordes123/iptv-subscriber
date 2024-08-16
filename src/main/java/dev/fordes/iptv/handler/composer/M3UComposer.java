@@ -14,31 +14,27 @@ public class M3UComposer implements Composer {
 
     @Override
     public Multi<String> apply(Multi<Channel> value) {
-        return Multi.createFrom().emitter(emitter -> {
-            emitter.emit(Constants.M3U_HEADER);
+        return value.onItem().transform(channel -> {
+            StringBuilder builder = new StringBuilder();
+            builder.append(Constants.EXTINF_PREFIX)
+                    .append(channel.getExtInf());
 
-            value.subscribe().with(channel -> {
+            Optional.ofNullable(channel.getTvgName()).filter(StringUtils::isNotBlank)
+                    .ifPresent(tvgName -> builder.append(String.format(" %s=\"%s\"", Channel.TVG_NAME, tvgName)));
 
-                StringBuilder builder = new StringBuilder();
-                builder.append(Constants.EXTINF_PREFIX)
-                        .append(channel.getExtInf());
+            Optional.ofNullable(channel.getTvgLogo()).filter(StringUtils::isNotBlank)
+                    .ifPresent(tvgLogo -> builder.append(String.format(" %s=\"%s\"", Channel.TVG_LOGO, tvgLogo)));
 
-                Optional.ofNullable(channel.getTvgName()).filter(StringUtils::isNotBlank)
-                        .ifPresent(tvgName -> builder.append(String.format(" %s=\"%s\"", Channel.TVG_NAME, tvgName)));
+            Optional.ofNullable(channel.getGroupTitle()).filter(StringUtils::isNotBlank)
+                    .ifPresent(groupTitle -> builder.append(String.format(" %s=\"%s\"", Channel.GROUP_TITLE, groupTitle)));
 
-                Optional.ofNullable(channel.getTvgLogo()).filter(StringUtils::isNotBlank)
-                        .ifPresent(tvgLogo -> builder.append(String.format(" %s=\"%s\"", Channel.TVG_LOGO, tvgLogo)));
+            Optional.ofNullable(channel.getDisplayName()).filter(StringUtils::isNotBlank)
+                    .ifPresent(displayName -> builder.append(String.format(" ,%s", displayName)));
 
-                Optional.ofNullable(channel.getGroupTitle()).filter(StringUtils::isNotBlank)
-                        .ifPresent(groupTitle -> builder.append(String.format(" %s=\"%s\"", Channel.GROUP_TITLE, groupTitle)));
+            builder.append(Constants.LF).append(channel.getUrl()).append(Constants.LF);
 
-                Optional.ofNullable(channel.getDisplayName()).filter(StringUtils::isNotBlank)
-                        .ifPresent(displayName -> builder.append(String.format(" ,%s", displayName)));
+            return builder.toString();
 
-                builder.append(Constants.LF).append(channel.getUrl()).append(Constants.LF);
-                emitter.emit(builder.toString());
-            });
-            emitter.complete();
         });
     }
 }

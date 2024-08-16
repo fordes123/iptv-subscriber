@@ -4,9 +4,9 @@ package dev.fordes.iptv.handler.parser;
 import dev.fordes.iptv.config.ISProperties;
 import dev.fordes.iptv.model.Channel;
 import dev.fordes.iptv.util.Constants;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.jboss.logmanager.Logger;
 
 import java.net.URI;
 import java.net.URL;
@@ -22,10 +22,10 @@ import java.util.regex.Pattern;
 /**
  * @author Chengfs on 2023/12/25
  */
+@Slf4j
 public class M3uParser extends Parser {
 
     private static final Pattern pattern = Pattern.compile("([a-z,A-Z,\\-]+)=\\\"(.*?)\\\"");
-    private final static Logger log = Logger.getLogger(M3uParser.class.getName());
 
     public M3uParser(ISProperties.Parser config, String fileName) {
         super(config, fileName);
@@ -68,7 +68,7 @@ public class M3uParser extends Parser {
                 try {
                     consumer.accept(parse(line, ext));
                 } catch (RuntimeException e) {
-                    log.severe(e.getMessage());
+                    log.error(e.getMessage());
                 }
             }
         }
@@ -99,6 +99,7 @@ public class M3uParser extends Parser {
             channel.setDisplayName(namePart);
             channel.setUrl(url);
 
+            log.debug("channel: {}", channel);
             return channel;
         } catch (Exception e) {
             throw new RuntimeException("parsing error:" + e.getMessage() + "\n line:" + line

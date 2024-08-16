@@ -15,22 +15,23 @@ iptv-subscriber:
     - http://epg.51zmt.top:8000/
 
   source:
-    - https://cdn.jsdelivr.net/gh/zbefine/iptv/iptv.m3u
-    - https://live.zhoujie218.top/dsyy/itvlist.txt
+    - https://raw.githubusercontent.com/joevess/IPTV/main/sources/iptv_sources.m3u8
+#    - https://cdn.jsdelivr.net/gh/zbefine/iptv/iptv.m3u
+#    - https://live.zhoujie218.top/dsyy/itvlist.txt
     #- https://live.fanmingming.com/tv/m3u/ipv6.m3u
 
   output:
-    - file: cctv-ipv4.m3u
+    - file: E:\\cctv-ipv4.m3u
       filter:
-        - addr:IPV4    # 地址为 ipv4
-        - dpi:1080 # 分辨率不低于 1080P
-        - fps:30   # 帧率不低于 30
+#        - addr:DOMAIN    # 地址为 ipv4
+        - dpi:480 # 分辨率不低于 1080P
+#        - fps:30   # 帧率不低于 30
       group:
         央视:
-          - addr:IPV4
-          - dpi:1080
-          - fps:30
+#          - addr:IPV4
+#          - dpi:1080
+#          - fps:30
           - name:/.*cctv.*/
         卫视:
-          - addr:IPV4
+#          - addr:IPV4
           - name:/.*卫视.*/

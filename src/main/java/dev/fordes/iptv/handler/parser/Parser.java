@@ -8,7 +8,6 @@ import dev.fordes.iptv.util.Constants;
 import dev.fordes.iptv.util.FileUtil;
 import dev.fordes.iptv.util.HttpUtil;
 import io.smallrye.mutiny.Multi;
-import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.core.buffer.Buffer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -35,12 +34,11 @@ public abstract class Parser implements Supplier<Multi<Channel>> {
     @Override
     public final Multi<Channel> get() {
         return Multi.createFrom().emitter(emitter -> {
-                    if (StringUtils.startsWithAny(this.path, Constants.HTTP_PREFIX,
-                            Constants.HTTPS_PREFIX)) {
-                        HttpUtil.get(this.path,true, opt ->
-                                        opt.setMaxChunkSize(config.readBufferSize()),
+                    if (StringUtils.startsWithAny(this.path, Constants.HTTP_PREFIX, Constants.HTTPS_PREFIX)) {
+                        log.debug("get url: {}", this.path);
+                        HttpUtil.get(this.path, true,
+                                opt -> opt.setMaxChunkSize(config.readBufferSize()),
                                 response -> response.handler(buffer -> {
-
                                     Buffer data;
                                     if (cache != null && cache.length() > 0) {
                                         data = Buffer.buffer(cache.length() + buffer.length())
@@ -57,12 +55,13 @@ public abstract class Parser implements Supplier<Multi<Channel>> {
                                     emitter.complete();
                                 }).exceptionHandler(emitter::fail));
                     } else {
+                        log.debug("read file: {}", this.path);
                         FileUtil.read(this.path, file -> file
                                 .setReadBufferSize(config.readBufferSize())
                                 .handler(buffer -> {
                                     Optional.of(cache).filter(i -> i.length() > 0).ifPresent(i -> {
                                         buffer.appendBuffer(i, 0, i.length());
-                                        i = Buffer.buffer();
+                                        cache = Buffer.buffer();
                                     });
                                     parse(buffer, false, emitter::emit);
                                 }).endHandler(() -> {
@@ -125,11 +124,10 @@ public abstract class Parser implements Supplier<Multi<Channel>> {
      * @param config   解析配置 {@link ISProperties.Parser}
      * @return 解析器
      */
-    public static Uni<Parser> getParser(String filePath, ISProperties.Parser config) {
-        return SourceType.of(filePath)
-                .map(type -> switch (type) {
-                    case M3U -> new M3uParser(config, filePath);
-                    case GENERIC -> new GenericParser(config, filePath);
-                });
+    public static Parser getParser(String filePath, ISProperties.Parser config) {
+        return switch (SourceType.of(filePath)) {
+            case M3U -> new M3uParser(config, filePath);
+            case GENERIC -> new GenericParser(config, filePath);
+        };
     }
 }

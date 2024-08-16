@@ -1,7 +1,10 @@
 package dev.fordes.iptv.model;
 
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
@@ -11,6 +14,9 @@ import java.net.URL;
  * @author Chengfs on 2023/12/25
  */
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Schema(name = "Channel", description = "频道")
 public class Channel {
 

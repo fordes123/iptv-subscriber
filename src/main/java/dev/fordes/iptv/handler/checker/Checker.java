@@ -34,14 +34,17 @@ public class Checker {
      * @return {@link Channel}
      */
     public static Uni<Channel> check(Channel channel) {
-        return detectMetadata(channel.getUrl())
+        Uni<Metadata> metadata = detectMetadata(channel.getUrl())
                 .onFailure()
                 .recoverWithItem(e -> {
                     log.error("detect channel information failed: {}", e.getMessage());
                     return Metadata.fail();
-                })
+                });
+
+        return metadata
                 .onItem().transform(e -> {
                     e.fill();
+                    channel.setMetadata(e);
                     return channel;
                 });
     }

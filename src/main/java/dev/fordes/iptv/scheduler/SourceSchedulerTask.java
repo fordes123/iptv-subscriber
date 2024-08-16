@@ -12,14 +12,15 @@ import dev.fordes.iptv.util.FilterUtil;
 import io.quarkus.runtime.Quarkus;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
+import io.vertx.core.file.OpenOptions;
 import io.vertx.mutiny.core.buffer.Buffer;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static dev.fordes.iptv.util.FileSuffix.M3U;
 import static dev.fordes.iptv.util.FileSuffix.M3U8;
@@ -34,8 +35,8 @@ public class SourceSchedulerTask {
     @Inject
     ISProperties config;
 
-    //    @Scheduled(cron = "{scheduled.source: disabled}")
-    public void source() throws InterruptedException {
+//    @Scheduled(cron = "{scheduled.source: disabled}")
+    public void source() {
 
         if (config.output().isEmpty()) {
             log.error("output is empty!");
@@ -46,43 +47,48 @@ public class SourceSchedulerTask {
                 .items(config.source().stream())
                 .filter(StringUtils::isNotBlank)
                 .map(e -> Parser.getParser(e, config.parser()))
-                .map(e -> e.flatMap(parser -> parser.get().toUni()))
-                .onItem().transform(e -> e.flatMap(Checker::check))
+                .flatMap(Parser::get)
+                .onItem()
+                .transform(Checker::check)
                 .flatMap(Uni::toMulti);
 
-        ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
-        config.output().forEach(file ->
-                //在虚拟线程中处理写入每一个文件
-                executor.submit(() -> {
-                    String suffix = FileSuffix.get(file.file());
-                    SourceType type = StringUtils.equalsAnyIgnoreCase(suffix, M3U, M3U8) ?
-                            SourceType.M3U : SourceType.GENERIC;
+        Map<String, ISProperties.OutputItem> outMap = config.output().stream()
+                .collect(Collectors.toMap(ISProperties.OutputItem::file, e -> e));
 
-                    Composer composer = Composer.getComposer(type);
-                    composer.apply(channels
-                                    .filter(e -> file.filter().stream().allMatch(f -> FilterUtil.match(f, e)))
-                                    .flatMap(e -> Multi.createFrom().emitter(emitter -> {
-                                        file.group().forEach((k, v) -> {
-                                            if (v.stream().allMatch(f -> FilterUtil.match(f, e))) {
-                                                Channel temp = e.copy();
-                                                temp.setGroupTitle(k);
-                                                emitter.emit(temp);
-                                            }
-                                        });
-                                        emitter.complete();
-                                    })))
-                            .map(e -> MutinyVertx.INSTANCE.getVertx().fileSystem()
-                                    .writeFile(file.file(), Buffer.buffer(e)))
-                            .flatMap(Uni::toMulti)
-                            .subscribe().with(
-                                    i -> log.info("write file: {}", file.file()),
-                                    e -> log.error("write file error: {}", file.file(), e)
-                            );
-                }));
+//        ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
+        config.output().forEach(file -> {
+            String suffix = FileSuffix.get(file.file());
+            SourceType type = StringUtils.equalsAnyIgnoreCase(suffix, M3U, M3U8) ? SourceType.M3U : SourceType.GENERIC;
 
-        executor.shutdown();
-        while (!executor.isTerminated()) {
-            Thread.sleep(1000);
-        }
+            Composer composer = Composer.getComposer(type);
+            Multi<String> content = composer.apply(channels
+                    .filter(e -> file.filter().stream().allMatch(f -> FilterUtil.match(f, e)))
+                    .flatMap(e -> Multi.createFrom().emitter(emitter -> {
+                        file.group().forEach((k, v) -> {
+                            if (v.stream().allMatch(f -> FilterUtil.match(f, e))) {
+                                Channel temp = e.copy();
+                                temp.setGroupTitle(k);
+                                emitter.emit(temp);
+                            }
+                        });
+                        emitter.complete();
+                    })));
+
+            final OpenOptions openOptions = new OpenOptions().setAppend(true)
+                    .setCreate(true).setTruncateExisting(true);
+
+            MutinyVertx.INSTANCE.getVertx().fileSystem()
+                    .open(file.file(), openOptions)
+                    .onItem().transform(e -> content.onItem().transform(c -> e.write(Buffer.buffer(c))))
+                    .subscribe().with(
+                            i -> log.info("write file: {}", file.file()),
+                            e -> log.error("write file error: {}", file.file(), e)
+                    );
+        });
+
+//        executor.shutdown();
+//        while (!executor.isTerminated()) {
+//            Thread.sleep(1000);
+//        }
     }
 }

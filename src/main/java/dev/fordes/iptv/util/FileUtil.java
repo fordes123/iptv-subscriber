@@ -17,11 +17,18 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * @author Chengfs on 2024/5/7
  */
 public class FileUtil {
+
+    public static void read(String path, Supplier<OpenOptions> optSupplier, Consumer<AsyncFile> asyncFileConsumer) {
+        MutinyVertx.INSTANCE.getVertx().fileSystem()
+                .open(path, optSupplier.get())
+                .subscribe().with(asyncFileConsumer);
+    }
 
     /**
      * 从指定路径响应式读取文件，并自定义结果处理<br/>
@@ -31,9 +38,7 @@ public class FileUtil {
      * @param asyncFileConsumer 结果处理器
      */
     public static void read(String path, Consumer<AsyncFile> asyncFileConsumer) {
-        MutinyVertx.INSTANCE.getVertx().fileSystem()
-                .open(path, new OpenOptions().setRead(true))
-                .subscribe().with(asyncFileConsumer);
+        read(path, () -> new OpenOptions().setRead(true), asyncFileConsumer);
     }
 
     public static Multi<String> read(String path) {

@@ -1,7 +1,6 @@
 package dev.fordes.iptv.model.enums;
 
 import dev.fordes.iptv.util.FileSuffix;
-import io.smallrye.mutiny.Uni;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -9,16 +8,16 @@ public enum SourceType {
 
     M3U, GENERIC;
 
-    public static Uni<SourceType> of(String path) {
+    public static SourceType of(String path) {
         String suffix = FileSuffix.get(path);
         if (FileSuffix.M3U.equals(suffix) || FileSuffix.M3U8.equals(suffix)) {
-            return Uni.createFrom().item(M3U);
+            return M3U;
         }
         return trySourceType(path);
     }
 
-    public static Uni<SourceType> trySourceType(String path) {
-        return Uni.createFrom().item(SourceType.GENERIC);
+    public static SourceType trySourceType(String path) {
+        return SourceType.GENERIC;
         //TODO
 //        try {
 //            Multi<SourceType> emitter1 = Multi.createFrom().emitter(emitter -> {
