@@ -1,12 +1,12 @@
 package dev.fordes.iptv.handler.parser;
 
 
-import dev.fordes.iptv.config.ISProperties;
 import dev.fordes.iptv.model.Channel;
 import dev.fordes.iptv.model.enums.SourceType;
 import dev.fordes.iptv.util.Constants;
 import dev.fordes.iptv.util.FileUtil;
 import dev.fordes.iptv.util.HttpUtil;
+import io.smallrye.config.WithDefault;
 import io.smallrye.mutiny.Multi;
 import io.vertx.mutiny.core.buffer.Buffer;
 import lombok.extern.slf4j.Slf4j;
@@ -23,10 +23,10 @@ import java.util.function.Supplier;
 public abstract class Parser implements Supplier<Multi<Channel>> {
 
     protected final String path;
-    protected final ISProperties.Parser config;
+    protected final Config config;
     private Buffer cache = Buffer.buffer();
 
-    public Parser(ISProperties.Parser config, String path) {
+    public Parser(Config config, String path) {
         this.config = config;
         this.path = path;
     }
@@ -121,13 +121,23 @@ public abstract class Parser implements Supplier<Multi<Channel>> {
      * 根据文件和配置获取解析器
      *
      * @param filePath 文件路径
-     * @param config   解析配置 {@link ISProperties.Parser}
+     * @param config   解析配置 {@link Config}
      * @return 解析器
      */
-    public static Parser getParser(String filePath, ISProperties.Parser config) {
+    public static Parser getParser(String filePath, Config config) {
         return switch (SourceType.of(filePath)) {
             case M3U -> new M3uParser(config, filePath);
             case GENERIC -> new GenericParser(config, filePath);
         };
+    }
+
+
+    public interface Config {
+
+        @WithDefault("8196")
+        Integer readBufferSize();
+
+        @WithDefault("false")
+        Boolean domainToHost();
     }
 }

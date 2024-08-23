@@ -9,7 +9,7 @@ scheduled:
 iptv-subscriber:
   parser:
     read-buffer-size: 8196
-    parse-domain-addr : false # 解析域名对应的IP类型
+    domain-to-host : false # 解析域名对应的IP类型
 
   epg:
     - http://epg.51zmt.top:8000/
@@ -31,7 +31,7 @@ iptv-subscriber:
 #          - addr:IPV4
 #          - dpi:1080
 #          - fps:30
-          - name:/.*cctv.*/
+          - name:CCTV
         卫视:
 #          - addr:IPV4
-          - name:/.*卫视.*/
+          - name:卫视

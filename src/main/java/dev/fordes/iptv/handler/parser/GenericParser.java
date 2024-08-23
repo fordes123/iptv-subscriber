@@ -1,7 +1,6 @@
 package dev.fordes.iptv.handler.parser;
 
 
-import dev.fordes.iptv.config.ISProperties;
 import dev.fordes.iptv.model.Channel;
 import dev.fordes.iptv.util.Constants;
 import org.apache.commons.lang3.StringUtils;
@@ -19,7 +18,7 @@ public class GenericParser extends Parser {
     private final static Logger log = Logger.getLogger(GenericParser.class.getName());
 
 
-    public GenericParser(ISProperties.Parser config, String fileName) {
+    public GenericParser(Config config, String fileName) {
         super(config, fileName);
     }
 

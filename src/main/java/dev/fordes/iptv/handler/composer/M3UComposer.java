@@ -3,6 +3,7 @@ package dev.fordes.iptv.handler.composer;
 import dev.fordes.iptv.model.Channel;
 import dev.fordes.iptv.util.Constants;
 import io.smallrye.mutiny.Multi;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Optional;
@@ -10,6 +11,7 @@ import java.util.Optional;
 /**
  * @author Chengfs on 2024/5/20
  */
+@Slf4j
 public class M3UComposer implements Composer {
 
     @Override
@@ -33,6 +35,7 @@ public class M3UComposer implements Composer {
 
             builder.append(Constants.LF).append(channel.getUrl()).append(Constants.LF);
 
+            log.info("compose m3u8: {}", builder);
             return builder.toString();
 
         });

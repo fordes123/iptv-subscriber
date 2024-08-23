@@ -8,6 +8,7 @@ import dev.fordes.iptv.model.domain.Code;
 import dev.fordes.iptv.model.domain.R;
 import dev.fordes.iptv.model.enums.SourceType;
 import dev.fordes.iptv.scheduler.SourceSchedulerTask;
+import dev.fordes.iptv.service.ChannelService;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import io.smallrye.mutiny.unchecked.Unchecked;
@@ -37,19 +38,17 @@ import static dev.fordes.iptv.util.Constants.HTTP_PREFIX_REGEX;
 @Path("/channel")
 public class ChannelResource {
 
+    @Inject
+    ChannelService channelService;
+
     @GET
     @Path("/")
     @Operation(summary = "通过URL获取频道信息")
     @APIResponse(responseCode = "200", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Channel.class)))
     public Uni<?> channel(@Valid @NotBlank @Pattern(regexp = HTTP_PREFIX_REGEX) @QueryParam("url") String url) {
-        return Uni.createFrom().item(url)
-                .onItem().transform(Unchecked.function(e -> URI.create(e).toURL()))
-                .flatMap(e -> Checker.detectMetadata(e)
-                        .map(metadata -> Channel.builder()
-                                .url(e).metadata(metadata).build()))
+        return channelService.detect(url)
                 .map(R::ok)
-                .onFailure()
-                .recoverWithItem(e -> {
+                .onFailure().recoverWithItem(e -> {
                     log.error("url: {}, {}: ", url, e.getMessage(), e);
                     return R.of(Code.INTERNAL_SERVER_ERROR, e.getMessage());
                 });
@@ -61,12 +60,9 @@ public class ChannelResource {
     @Parameter(name = "url", required = true)
     @APIResponse(responseCode = "200", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Metadata.class)))
     public Uni<?> metadata(@Valid @NotBlank @Pattern(regexp = HTTP_PREFIX_REGEX) @QueryParam("url") String url) {
-        return Uni.createFrom().item(url)
-                .map(Unchecked.function(e -> URI.create(e).toURL()))
-                .flatMap(Checker::detectMetadata)
+        return channelService.metadata(url)
                 .map(R::ok)
-                .onFailure()
-                .recoverWithItem(e -> {
+                .onFailure().recoverWithItem(e -> {
                     log.error("url: {}, {}: ", url, e.getMessage(), e);
                     return R.of(Code.INTERNAL_SERVER_ERROR, e.getMessage());
                 });

@@ -1,7 +1,6 @@
 package dev.fordes.iptv.handler.parser;
 
 
-import dev.fordes.iptv.config.ISProperties;
 import dev.fordes.iptv.model.Channel;
 import dev.fordes.iptv.util.Constants;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +26,7 @@ public class M3uParser extends Parser {
 
     private static final Pattern pattern = Pattern.compile("([a-z,A-Z,\\-]+)=\\\"(.*?)\\\"");
 
-    public M3uParser(ISProperties.Parser config, String fileName) {
+    public M3uParser(Config config, String fileName) {
         super(config, fileName);
     }
 

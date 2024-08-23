@@ -1,8 +1,8 @@
 package dev.fordes.iptv.config;
 
+import dev.fordes.iptv.handler.parser.Parser;
 import io.smallrye.common.constraint.NotNull;
 import io.smallrye.config.ConfigMapping;
-import io.smallrye.config.WithDefault;
 
 import java.util.List;
 import java.util.Map;
@@ -29,7 +29,7 @@ public interface ISProperties {
     /**
      * 解析器配置
      */
-    Parser parser();
+    Parser.Config parser();
 
     interface OutputItem {
 
@@ -40,14 +40,5 @@ public interface ISProperties {
 
         Map<String, Set<String>> group();
 
-    }
-
-    interface Parser {
-
-        @WithDefault("8196")
-        Integer readBufferSize();
-
-        @WithDefault("false")
-        Boolean parseDomainAddr();
     }
 }
