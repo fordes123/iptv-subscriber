@@ -26,6 +26,7 @@ public interface SourceConfig {
         @WithConverter(FilePathConverter.class)
         String file();
 
+        //TODO 除file外属性更改为可选
         Set<@NotBlank String> filter();
 
         Map<String, Set<@NotBlank String>> group();

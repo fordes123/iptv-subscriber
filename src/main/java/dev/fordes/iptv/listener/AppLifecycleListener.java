@@ -1,5 +1,6 @@
 package dev.fordes.iptv.listener;
 
+import io.quarkus.arc.profile.IfBuildProfile;
 import io.quarkus.runtime.ShutdownEvent;
 import io.quarkus.runtime.StartupEvent;
 import io.quarkus.runtime.annotations.ConvertWith;
@@ -16,6 +17,7 @@ import java.util.Optional;
  */
 @Slf4j
 @ApplicationScoped
+@IfBuildProfile("dev")
 public class AppLifecycleListener {
 
     @ConfigProperty(name = "quarkus.http.port", defaultValue = "8080")
@@ -44,7 +46,6 @@ public class AppLifecycleListener {
         log.info("Open API Schema document: {}", address + Optional.of(openApiPath)
                 .filter(e -> !e.isBlank()).orElse(nonAppPath + "/openapi"));
     }
-
 
     void onStop(@Observes ShutdownEvent ev) {
         //TODO clean caches

@@ -1,0 +1,20 @@
+name: 🎯 提交功能建议
+description: 提交您的功能建议，帮助我们完善本项目
+body:
+  - type: checkboxes
+    id: make-sure
+    attributes:
+      label: 必要检查
+      description: |
+        在提交建议之前，请确认您已彻底搜索了有关同一功能的任何现有建议。如果未发现请继续提交。
+      options:
+        - label: 确认经过搜索，没有发现任何相关功能建议。
+          required: true
+
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: 建议内容
+      description: 清楚地描述您的诉求，最好附上原因。
+    validations:
+      required: true
