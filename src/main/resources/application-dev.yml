@@ -1,37 +1,16 @@
-quarkus:
-  http:
-    port: 8848
+server:
+  log-level: DEBUG
 
-scheduled:
-  source: '0/2 * * * * ?'
-  epg: '0/2 * * * * ?'
-
-iptv-subscriber:
-  parser:
-    read-buffer-size: 8196
-    domain-to-host : false # 解析域名对应的IP类型
-
-  epg:
-    - http://epg.51zmt.top:8000/
-
-  source:
-    - https://raw.githubusercontent.com/joevess/IPTV/main/sources/iptv_sources.m3u8
-#    - https://cdn.jsdelivr.net/gh/zbefine/iptv/iptv.m3u
-#    - https://live.zhoujie218.top/dsyy/itvlist.txt
-    #- https://live.fanmingming.com/tv/m3u/ipv6.m3u
-
-  output:
+tv-source:
+  supplier:
+    - E:\test.m3u8
+  #    - https://raw.githubusercontent.com/joevess/IPTV/main/home.m3u8
+  consumer:
     - file: E:\\cctv-ipv4.m3u
       filter:
-#        - addr:DOMAIN    # 地址为 ipv4
-        - dpi:480 # 分辨率不低于 1080P
-#        - fps:30   # 帧率不低于 30
+        - dpi:480
       group:
         央视:
-#          - addr:IPV4
-#          - dpi:1080
-#          - fps:30
           - name:CCTV
         卫视:
-#          - addr:IPV4
           - name:卫视

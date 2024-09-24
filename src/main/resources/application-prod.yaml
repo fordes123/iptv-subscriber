@@ -1,0 +1,47 @@
+server:
+  port: 8848
+  context-path: /api/v1
+  log-level: INFO # 全局日志级别，影响控制台和日志文件
+
+  parser:  # 解析器配置
+    log-level: DEBUG # 日志级别，可以覆盖全局
+    read-buffer-size: 8196 # 解析器 读取时缓冲区大小
+    domain-to-host: false # 将直播源中的域名解析为IP
+
+  composer: # 构造器配置
+    log-level: DEBUG # 日志级别，可以覆盖全局
+
+  checker: # 检查器配置
+    log-level: DEBUG  # 日志级别，可以覆盖全局
+
+# xml 节目单
+xml-guide:
+  cron: disable
+  supplier: # 节目单订阅列表，支持http或本地文件
+    - http://epg.51zmt.top:8000/
+    - https://epg.example.com
+
+# 直播源
+tv-source:
+  cron: '0 0/5 * * * ?'  # 运行策略，填写有效的cron表达式 或 disable表示禁用
+  supplier: # 直播源订阅列表，支持http或本地文件
+    - ./test.m3u8
+    - https://raw.githubusercontent.com/joevess/IPTV/main/home.m3u8
+  consumer:
+    - file: ./cctv-ipv4.m3u # 输出文件路径，支持绝对路径或相对路径
+      filter: # 过滤条件，满足全部条件才会输出
+        - addr:DOMAIN    # 地址为 ipv4
+        - dpi:480        # 分辨率不低于 1080P
+        - fps:30         # 帧率不低于 30
+      group: # 分组依据
+        央视: # 分组名称
+          - addr:IPV4   # 地址为 ipv4
+          - dpi:1080    # 分辨率不低于 1080P
+
+    - file: cctv-ipv6.m3u
+      filter:
+        - addr:IPV6
+
+    - file: all.m3u
+
+

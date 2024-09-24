@@ -3,6 +3,7 @@ package dev.fordes.iptv.handler.parser;
 
 import dev.fordes.iptv.model.Channel;
 import dev.fordes.iptv.util.Constants;
+import io.vertx.core.json.Json;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -98,7 +99,7 @@ public class M3uParser extends Parser {
             channel.setDisplayName(namePart);
             channel.setUrl(url);
 
-            log.debug("channel: {}", channel);
+            log.debug("channel parsed: {}", Json.encode(channel));
             return channel;
         } catch (Exception e) {
             throw new RuntimeException("parsing error:" + e.getMessage() + "\n line:" + line

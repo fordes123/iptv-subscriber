@@ -9,6 +9,7 @@ import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
 import java.net.URL;
+import java.util.stream.Stream;
 
 /**
  * @author Chengfs on 2023/12/25
@@ -93,5 +94,12 @@ public class Channel {
         channel.setTvgUrl(this.getTvgUrl());
         channel.setMetadata(this.getMetadata());
         return channel;
+    }
+
+    public String absName() {
+        return Stream.of(this.getTvgName(), this.getTvgId(), this.getDisplayName())
+                .filter(e -> e != null && !e.isEmpty())
+                .findFirst()
+                .orElse(null);
     }
 }

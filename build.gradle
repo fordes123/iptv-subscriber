@@ -44,12 +44,6 @@ test {
     systemProperty "java.util.logging.manager", "org.jboss.logmanager.LogManager"
 }
 
-processResources {
-    filesMatching("application.yml") {
-        expand(project.properties)
-    }
-}
-
 compileJava {
     options.encoding = 'UTF-8'
     options.compilerArgs << '-parameters'

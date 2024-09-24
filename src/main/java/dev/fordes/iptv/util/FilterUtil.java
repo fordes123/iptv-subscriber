@@ -9,7 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
-import java.util.stream.Stream;
+import java.util.Optional;
 
 /**
  * @author Chengfs on 2024/5/17
@@ -31,7 +31,13 @@ public class FilterUtil {
     public static boolean match(String flag, Channel channel) {
         String[] split = StringUtils.split(flag, Constants.COLON);
         if (split.length == 2 && StringUtils.isNotBlank(split[0]) && StringUtils.isNotBlank(split[1])) {
-            return match(Tuple2.of(split[0], split[1]), channel);
+
+            return Optional.of(match(Tuple2.of(split[0], split[1]), channel))
+                    .filter(Boolean::booleanValue)
+                    .map(matched -> {
+                        log.debug("channel: {}({}) => matched tag: {}", channel.absName(), channel.getUrl(), flag);
+                        return true;
+                    }).orElse(false);
         }
         log.warn("Invalid filter flag: {}", flag);
         return false;
@@ -53,18 +59,13 @@ public class FilterUtil {
             }
             case Flag.CODEC -> tuple.getItem2().equalsIgnoreCase(channel.getMetadata().getVideoCodec());
             case Flag.NAME -> {
-
+                String name = channel.absName();
                 if (tuple.getItem2().startsWith("/") && tuple.getItem2().endsWith("/")) {
                     //正则
                     String reg = StringUtils.substringBetween(tuple.getItem2(), "/", "/");
-                    String name = Stream.of(channel.getTvgName(), channel.getTvgId(), channel.getDisplayName())
-                            .filter(e -> e != null && !e.isEmpty())
-                            .findFirst()
-                            .orElse(null);
-
                     yield name != null && name.matches(reg);
                 } else {
-                    yield channel.getTvgName().contains(tuple.getItem2());
+                    yield name != null && name.contains(tuple.getItem2());
                 }
             }
             case Flag.ADDR -> Addr.of(tuple.getItem2()).equals(channel.getMetadata().getType());

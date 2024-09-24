@@ -9,6 +9,7 @@ import dev.fordes.iptv.util.Constants;
 import dev.fordes.iptv.util.HttpUtil;
 import io.smallrye.mutiny.Uni;
 import io.vertx.core.http.HttpHeaders;
+import io.vertx.core.json.Json;
 import jakarta.annotation.Nonnull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -34,19 +35,21 @@ public class Checker {
      * @return {@link Channel}
      */
     public static Uni<Channel> check(Channel channel) {
+        long l = System.currentTimeMillis();
         Uni<Metadata> metadata = detectMetadata(channel.getUrl())
                 .onFailure()
                 .recoverWithItem(e -> {
-                    log.error("detect channel information failed: {}", e.getMessage());
+                    log.error("channel detect: {}({}) failed: {}", channel.absName(), channel.getUrl(), e.getMessage());
                     return Metadata.fail();
                 });
 
-        return metadata
-                .onItem().transform(e -> {
-                    e.fill();
-                    channel.setMetadata(e);
-                    return channel;
-                });
+        return metadata.onItem().transform(e -> {
+            e.fill();
+            channel.setMetadata(e);
+            log.debug("channel detect -[{} ms]: {}({}) => metadata: {}",
+                    System.currentTimeMillis() - l, channel.absName(), channel.getUrl(), Json.encode(e));
+            return channel;
+        });
     }
 
     /**

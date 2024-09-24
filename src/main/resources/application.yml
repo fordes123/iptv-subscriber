@@ -4,8 +4,8 @@ quarkus:
     version: {project.version}
 
   http:
-    port: 8848
-    root-path: /api/v1
+    port: ${server.port:8080}
+    root-path: ${server.context-path:/api/v1}
     non-application-root-path: /dev
 
   jackson:
@@ -34,14 +34,25 @@ quarkus:
     level: INFO
     file:
       path: logs/iptv-subscriber.log
-      level: WARN
+      level: ${server.log-level:INFO}
       encoding: UTF-8
     console:
-      level: DEBUG
+      level: ${server.log-level:INFO}
       format: "%d{HH:mm:ss} %-5p [%c{2.}] (%t) %s%e%n"
     category:
       "dev.fordes.iptv":
-        level: DEBUG
+        level: ${server.log-level:INFO}
+      "dev.fordes.iptv.handler.composer":
+        level: ${server.parser.log-level:${quarkus.log.file.level}}
+      "dev.fordes.iptv.handler.checker":
+        level: ${server.checker.log-level:${quarkus.log.file.level}}
+      "dev.fordes.iptv.handler.parser":
+        level: ${server.parser.log-level:${quarkus.log.file.level}}
 
-#iptv-subscriber:
-#  debug: true
+
+"%prod":
+  quarkus:
+    smallrye-openapi:
+      enable: false
+    swagger-ui:
+      enable: false

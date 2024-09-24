@@ -41,6 +41,9 @@ public class ChannelResource {
     @Inject
     ChannelService channelService;
 
+    @Inject
+    SourceSchedulerTask source;
+
     @GET
     @Path("/")
     @Operation(summary = "通过URL获取频道信息")
@@ -89,8 +92,6 @@ public class ChannelResource {
                 .toUni();
     }
 
-    @Inject
-    SourceSchedulerTask source;
 
     @GET
     @Path("/test2")
