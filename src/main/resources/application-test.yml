@@ -3,7 +3,7 @@ server:
 
 tv-source:
   supplier:
-    - https://iptv-org.github.io/iptv/countries/us.m3u
+    - https://iptv-org.github.io/iptv/categories/animation.m3u
   consumer:
     - file: ./all.m3u
     - file: ./ipv4.m3u
