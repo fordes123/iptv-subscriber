@@ -4,6 +4,7 @@ import dev.fordes.iptv.model.enums.MutinyVertx;
 import io.smallrye.mutiny.Multi;
 import io.vertx.core.file.OpenOptions;
 import io.vertx.mutiny.core.MultiMap;
+import io.vertx.mutiny.core.buffer.Buffer;
 import io.vertx.mutiny.core.file.AsyncFile;
 import io.vertx.mutiny.core.http.HttpHeaders;
 import org.apache.commons.lang3.StringUtils;
@@ -24,31 +25,11 @@ import java.util.function.Supplier;
  */
 public class FileUtil {
 
-    public static void read(String path, Supplier<OpenOptions> optSupplier, Consumer<AsyncFile> asyncFileConsumer) {
-        MutinyVertx.INSTANCE.getVertx().fileSystem()
-                .open(path, optSupplier.get())
-                .subscribe().with(asyncFileConsumer);
-    }
-
-    /**
-     * 从指定路径响应式读取文件，并自定义结果处理<br/>
-     * 结果逐块处理，处理器可能被多次调用
-     *
-     * @param path              路径
-     * @param asyncFileConsumer 结果处理器
-     */
-    public static void read(String path, Consumer<AsyncFile> asyncFileConsumer) {
-        read(path, () -> new OpenOptions().setRead(true), asyncFileConsumer);
-    }
-
-    public static Multi<String> read(String path) {
-        return MutinyVertx.INSTANCE.getVertx().fileSystem().readFile(path)
-                .onItem().transform(buffer -> buffer.toString(StandardCharsets.UTF_8)).toMulti();
-    }
-
-    public static Path TEMP_DIR = Path.of(System.getProperty("java.io.tmpdir") + File.separator + "iptv-subscriber");
+    //全局临时文件路径
+    public static final Path TEMP_DIR;
 
     static {
+        TEMP_DIR = Path.of(System.getProperty("java.io.tmpdir") + File.separator + "iptv-subscriber");
         try {
             if (!Files.exists(TEMP_DIR)) {
                 Files.createDirectory(TEMP_DIR);
@@ -56,6 +37,40 @@ public class FileUtil {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+
+    /**
+     * 从指定路径响应式读取文件，并自定义结果处理<br/>
+     * 结果逐块处理，处理器可能被多次调用
+     *
+     * @param path              路径
+     * @param optSupplier       {@link Supplier<OpenOptions>}
+     * @param asyncFileConsumer 结果处理器
+     */
+    public static void read(String path, Supplier<OpenOptions> optSupplier, Consumer<AsyncFile> asyncFileConsumer) {
+        MutinyVertx.INSTANCE.getVertx().fileSystem()
+                .open(path, optSupplier.get())
+                .subscribe().with(asyncFileConsumer);
+    }
+
+    /**
+     * @see #read(String, Supplier, Consumer)
+     */
+    public static void read(String path, Consumer<AsyncFile> asyncFileConsumer) {
+        read(path, () -> new OpenOptions().setRead(true), asyncFileConsumer);
+    }
+
+    /**
+     * 从指定路径响应式读取文件，将结果转换为 String 并返回
+     *
+     * @param path 文件路径
+     * @return {@link Multi<String}
+     * @see #read(String, Consumer)
+     */
+    public static Multi<String> read(String path) {
+        return MutinyVertx.INSTANCE.getVertx().fileSystem().readFile(path)
+                .onItem().transform(buffer -> buffer.toString(StandardCharsets.UTF_8)).toMulti();
     }
 
 
@@ -124,5 +139,37 @@ public class FileUtil {
         return createTempFile(url, null);
     }
 
+    /**
+     * 将多行内容写入文件
+     *
+     * @param file    文件路径
+     * @param content 内容
+     */
+    public static void write(String file, Multi<String> content) {
+        final OpenOptions openOptions = new OpenOptions()
+                .setCreate(true)
+                .setTruncateExisting(true);
 
+        MutinyVertx.INSTANCE.getVertx().fileSystem()
+                .open(file, openOptions)
+                .onItem().transformToUni(asyncFile ->
+                        content.onItem().transformToUni(str -> {
+                                    Buffer buffer = Buffer.buffer(str);
+                                    return asyncFile.write(buffer)
+                                            .onFailure().transform(t -> new RuntimeException("Write failed", t)); // Handle write errors
+                                })
+                                .concatenate()
+                                .onFailure().recoverWithItem(t -> {
+                                    // Error handling for individual write failures
+                                    System.err.println("Error writing to file: " + t.getMessage());
+                                    return null; // Continue with next items
+                                })
+                                .collect().asList() // Collect all writes to ensure completion
+                                .onItem().transformToUni(ignored -> asyncFile.close()) // Close file after all writes are done
+                )
+                .subscribe().with(
+                        ignored -> System.out.println("Write completed successfully"),
+                        failure -> System.err.println("Write operation failed: " + failure.getMessage())
+                );
+    }
 }

@@ -1,0 +1,11 @@
+server:
+  log-level: DEBUG
+
+tv-source:
+  supplier:
+    - https://iptv-org.github.io/iptv/countries/us.m3u
+  consumer:
+    - file: ./all.m3u
+    - file: ./ipv4.m3u
+      filter:
+        - addr:IPV4

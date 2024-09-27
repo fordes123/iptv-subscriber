@@ -15,7 +15,7 @@ import java.util.Set;
 @ConfigMapping(prefix = "tv-source")
 public interface SourceConfig {
 
-    Optional<@NotBlank String> cron();
+    Optional<String> cron();
 
     Optional<Set<@NotBlank String>> supplier();
 
@@ -26,9 +26,8 @@ public interface SourceConfig {
         @WithConverter(FilePathConverter.class)
         String file();
 
-        //TODO 除file外属性更改为可选
-        Set<@NotBlank String> filter();
+        Optional<Set<@NotBlank String>> filter();
 
-        Map<String, Set<@NotBlank String>> group();
+        Map<String, Optional<Set<@NotBlank String>>> group();
     }
 }

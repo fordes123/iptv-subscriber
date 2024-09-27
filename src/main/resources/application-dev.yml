@@ -9,8 +9,3 @@ tv-source:
     - file: E:\\cctv-ipv4.m3u
       filter:
         - dpi:480
-      group:
-        央视:
-          - name:CCTV
-        卫视:
-          - name:卫视
