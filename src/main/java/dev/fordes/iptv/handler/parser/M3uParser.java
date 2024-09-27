@@ -60,6 +60,12 @@ public class M3uParser extends Parser {
         while (iterator.hasNext()) {
             String line = iterator.next();
             String ext = null;
+
+            //skip invalid line
+            if (!StringUtils.startsWithAny(line, Channel.EXT_INF, Constants.HTTP_PREFIX, Constants.HTTPS_PREFIX)) {
+                continue;
+            }
+
             while (line.startsWith(Channel.EXT_INF) && iterator.hasNext()) {
                 ext = line;
                 line = iterator.next();
